@@ -1,0 +1,76 @@
+/* Light Theme Variables */
+:root {
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F8F9FA;
+  --bg-card: #FFFFFF;
+  --bg-elevated: #FFFFFF;
+
+  --text-primary: #1A1A1A;
+  --text-secondary: #6B7280;
+  --text-tertiary: #9CA3AF;
+
+  --border-primary: #E5E7EB;
+  --border-secondary: #F3F4F6;
+
+  --accent-purple: #7C5CE8;
+  --accent-purple-light: #EDE9FE;
+  --accent-purple-dark: #6D28D9;
+
+  --accent-teal: #0D9488;
+  --accent-teal-light: #CCFBF1;
+  --accent-teal-dark: #0F766E;
+
+  --accent-gold: #D97706;
+  --accent-gold-light: #FEF3C7;
+  --accent-gold-dark: #B45309;
+
+  --accent-blue: #3B82F6;
+  --accent-blue-light: #DBEAFE;
+
+  --accent-red: #EF4444;
+  --accent-red-light: #FEE2E2;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+
+  --glow-purple: 0 0 20px rgba(124, 92, 232, 0.15);
+  --glow-teal: 0 0 20px rgba(13, 148, 136, 0.15);
+  --glow-gold: 0 0 20px rgba(217, 119, 6, 0.15);
+}
+
+/* Light theme Leaflet overrides */
+.leaflet-container {
+  background: #F8F9FA !important;
+}
+
+.leaflet-popup-content-wrapper {
+  background: #FFFFFF !important;
+  color: #1A1A1A !important;
+  border: 1px solid #E5E7EB !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+.leaflet-popup-tip {
+  background: #FFFFFF !important;
+  border: 1px solid #E5E7EB !important;
+}
+
+.leaflet-popup-close-button {
+  color: #6B7280 !important;
+}
+
+.leaflet-popup-close-button:hover {
+  color: #1A1A1A !important;
+}
+
+.leaflet-control-attribution {
+  background: rgba(255, 255, 255, 0.95) !important;
+  color: #6B7280 !important;
+  border: 1px solid #E5E7EB !important;
+}
+
+.leaflet-control-attribution a {
+  color: #7C5CE8 !important;
+}

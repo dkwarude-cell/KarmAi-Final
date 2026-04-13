@@ -1,0 +1,70 @@
+/* Leaflet Map Light Theme Overrides */
+.leaflet-container {
+  background: #F8F9FA;
+  font-family: 'Inter', sans-serif;
+}
+
+.leaflet-popup-content-wrapper {
+  background: #FFFFFF;
+  color: #1A1A1A;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.leaflet-popup-tip {
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+}
+
+.leaflet-popup-close-button {
+  color: #6B7280 !important;
+  font-size: 20px !important;
+  padding: 4px 8px !important;
+}
+
+.leaflet-popup-close-button:hover {
+  color: #1A1A1A !important;
+}
+
+.leaflet-control-attribution {
+  background: rgba(255, 255, 255, 0.95) !important;
+  color: #6B7280 !important;
+  font-size: 9px !important;
+  backdrop-filter: blur(12px);
+  border-radius: 8px;
+  padding: 2px 6px !important;
+  margin: 0 8px 8px 0 !important;
+  border: 1px solid #E5E7EB !important;
+}
+
+.leaflet-control-attribution a {
+  color: #7C5CE8 !important;
+}
+
+/* Custom marker hover effect */
+.custom-marker:hover {
+  transform: scale(1.1);
+}
+
+/* Hide leaflet's default controls */
+.leaflet-control-zoom {
+  display: none !important;
+}
+
+/* User location marker */
+.user-marker {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(13, 148, 136, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(13, 148, 136, 0);
+  }
+}
