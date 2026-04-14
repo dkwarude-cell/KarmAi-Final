@@ -5,17 +5,20 @@ This document outlines the architecture and implementation steps to bridge the R
 ## 1. High-Level Technical Implementation Guide
 
 **Infrastructure Profile:**
-* **Compute:** AMD GPU Cloud Instance (e.g., Azure NDv4 or a local rig with Radeon RX 7900 XTX).
-* **OS / Drivers:** Linux (Ubuntu 22.04 highly recommended) with **ROCm 6.0+** installed.
-* **ML Framework:** PyTorch for ROCm (which natively intercepts `.cuda()` calls and maps them to AMD's HIP runtime).
-* **Serving Layer:** FastAPI paired with Uvicorn for asynchronous request handling.
+
+- **Compute:** AMD GPU Cloud Instance (e.g., Azure NDv4 or a local rig with Radeon RX 7900 XTX).
+- **OS / Drivers:** Linux (Ubuntu 22.04 highly recommended) with **ROCm 6.0+** installed.
+- **ML Framework:** PyTorch for ROCm (which natively intercepts `.cuda()` calls and maps them to AMD's HIP runtime).
+- **Serving Layer:** FastAPI paired with Uvicorn for asynchronous request handling.
 
 ---
 
 ## 2. Python FastAPI Backend Structure (AMD GPU)
 
 ### `amd_backend/requirements.txt`
+
 To utilize AMD GPUs, fetching PyTorch from the specific ROCm index is required.
+
 ```text
 fastapi>=0.100.0
 uvicorn>=0.23.0
@@ -28,6 +31,7 @@ torch torchvision torchaudio
 ```
 
 ### `amd_backend/main.py`
+
 This sets up a FastAPI server and loads the AI weights.
 
 ```python
@@ -81,7 +85,7 @@ async def generate_chat(request: ChatRequest):
         raise HTTPException(status_code=400, detail="Prompt is required.")
 
     formatted_prompt = f"<s>[INST] {request.prompt} [/INST]"
-    
+
     try:
         inputs = tokenizer(formatted_prompt, return_tensors="pt").to(DEVICE)
         with torch.no_grad():
@@ -92,7 +96,7 @@ async def generate_chat(request: ChatRequest):
                 do_sample=True,
                 pad_token_id=tokenizer.eos_token_id
             )
-            
+
         response_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
         answer = response_text.split("[/INST]")[-1].strip()
         return ChatResponse(response=answer)
@@ -113,25 +117,29 @@ Run this backend via: `pip install -r requirements.txt && python main.py`
 We have built a connector in `src/utils/ai-client.ts`:
 
 ```typescript
-const API_BASE_URL = import.meta.env.VITE_AI_BACKEND_URL || 'http://localhost:8000';
+const API_BASE_URL =
+  import.meta.env.VITE_AI_BACKEND_URL || "http://localhost:8000";
 
 export interface ChatRequestPayload {
   prompt: string;
   max_tokens?: number;
 }
 
-export const fetchAIConciergeResponse = async (payload: ChatRequestPayload): Promise<string> => {
+export const fetchAIConciergeResponse = async (
+  payload: ChatRequestPayload,
+): Promise<string> => {
   try {
     const response = await fetch(`${API_BASE_URL}/api/v1/chat`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         prompt: payload.prompt,
         max_tokens: payload.max_tokens || 256,
       }),
     });
 
-    if (!response.ok) throw new Error(`AI Backend Error: ${response.statusText}`);
+    if (!response.ok)
+      throw new Error(`AI Backend Error: ${response.statusText}`);
     const data = await response.json();
     return data.response;
   } catch (error) {
