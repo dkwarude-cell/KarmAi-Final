@@ -1,12 +1,25 @@
+import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { ArrowLeft, Trophy, TrendingUp, Award } from "lucide-react";
+import { supabase } from "../../utils/supabase";
 
 interface LeaderboardScreenProps {
   onClose: () => void;
   currentUserRank: number;
 }
 
-const leaderboardData = [
+interface ProfileData {
+  id?: string;
+  rank: number;
+  name: string;
+  college: string;
+  karmaPoints: number;
+  level: number;
+  badge?: string;
+  isCurrentUser?: boolean;
+}
+
+const defaultLeaderboard = [
   {
     rank: 1,
     name: "Priya Raut",
@@ -73,6 +86,39 @@ const leaderboardData = [
 ];
 
 export default function LeaderboardScreen({ onClose, currentUserRank }: LeaderboardScreenProps) {
+  const [leaderboardData, setLeaderboardData] = useState<ProfileData[]>(defaultLeaderboard as any);
+  
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("id, full_name, college, karma_score, level")
+          .order("karma_score", { ascending: false })
+          .limit(10);
+        
+        if (error) return;
+
+        if (data && data.length > 0) {
+          const formatted = data.map((profile, i) => ({
+            id: profile.id,
+            rank: i + 1,
+            name: profile.full_name || "New Explorer",
+            college: profile.college || "KarmAI User",
+            karmaPoints: profile.karma_score || 0,
+            level: profile.level || 1,
+            badge: i === 0 ? "??" : i === 1 ? "??" : i === 2 ? "??" : "??",
+            isCurrentUser: user?.id === profile.id
+          }));
+          
+          setLeaderboardData(formatted);
+        }
+      } catch (err) {}
+    };
+    
+    fetchLeaderboard();
+  }, []);
   return (
     <div className="w-[390px] h-[844px] bg-[#0A0A0F] relative flex flex-col">
       {/* Header */}

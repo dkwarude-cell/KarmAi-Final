@@ -44,6 +44,7 @@ import PartnerDashboard from "./components/PartnerDashboard";
 import AIConcierge from "./components/AIConcierge";
 import SquadDrift from "./components/SquadDrift";
 import AccessibilitySettings from "./components/AccessibilitySettings";
+import { supabase } from "../utils/supabase";
 import { UserProfile, defaultProfile } from "./types/profile";
 import { GamificationState, defaultGamification } from "./types/gamification";
 
@@ -88,6 +89,48 @@ export default function App() {
   const [showAccessibility, setShowAccessibility] = useState(false);
   const [showCreatorStudio, setShowCreatorStudio] = useState(false);
   const [hideMap, setHideMap] = useState(true); // Start with map hidden since we default to home view
+  // Global Auth Sync
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        fetchUserProfile(session.user.id);
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        fetchUserProfile(session.user.id);
+      } else {
+        setAppState("login");
+        setUserProfile(defaultProfile);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const fetchUserProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", userId)
+        .single();
+      
+      if (!error && data) {
+        setUserProfile(prev => ({
+          ...prev,
+          name: data.full_name || prev.name,
+          college: data.college || prev.college,
+          level: data.level || prev.level,
+          karmaPoints: data.karma_score || prev.karmaPoints
+        }));
+      }
+    } catch (err) {
+      console.error("Error fetching profile:", err);
+    }
+  };
+
 
   // Auto-progress from splash to interests
   useEffect(() => {

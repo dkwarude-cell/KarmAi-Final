@@ -1,14 +1,53 @@
+import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import BottomNav from "./BottomNav";
+import { supabase } from "../../utils/supabase";
 
 interface ExploreScreenProps {
   onNavigate: (screen: string) => void;
 }
 
+interface LocationData {
+  id?: string;
+  name: string;
+  uploader?: string;
+  description?: string;
+  tags: string[];
+  interested: number;
+  color: string;
+  category: string;
+}
+
 export default function ExploreScreen({ onNavigate }: ExploreScreenProps) {
   const tabs = ["For You", "City", "National", "Global"];
+  
+  const [dbLocations, setDbLocations] = useState<LocationData[]>([]);
 
-  const experiencesData = [
+  useEffect(() => {
+    const fetchLocations = async () => {
+      const { data, error } = await supabase.from("locations").select("*").limit(5);
+      if (error) {
+        console.error("Error fetching locations:", error);
+        return;
+      }
+      if (data && data.length > 0) {
+        const mapped = data.map((loc, idx) => ({
+          id: loc.id,
+          name: loc.name,
+          description: loc.description,
+          uploader: 'Local Verified',
+          tags: loc.metadata?.tags || [loc.category],
+          interested: Math.floor(Math.random() * 50) + 10,
+          color: idx % 2 === 0 ? "#F0A500" : "#00CBA4",
+          category: loc.category
+        }));
+        setDbLocations(mapped);
+      }
+    };
+    fetchLocations();
+  }, []);
+
+  const defaultExperiences = [
     {
       name: "Ajanta Caves, Maharashtra",
       uploader: "Riya from VJTI Mumbai",
@@ -34,6 +73,8 @@ export default function ExploreScreen({ onNavigate }: ExploreScreenProps) {
       category: "Culture",
     },
   ];
+
+  const experiencesData = dbLocations.length > 0 ? dbLocations : defaultExperiences;
 
   return (
     <div className="w-[390px] h-[844px] bg-[#0A0A0F] relative flex flex-col">

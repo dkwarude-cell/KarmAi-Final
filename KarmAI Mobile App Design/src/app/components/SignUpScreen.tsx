@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "motion/react";
-import { Mail, Phone, ArrowRight, Eye, EyeOff, User } from "lucide-react";
+import { Mail, Phone, ArrowRight, Eye, EyeOff, User, Loader2 } from "lucide-react";
+import { supabase } from "../../../src/utils/supabase";
 
 interface SignUpScreenProps {
   onSignUp: () => void;
@@ -14,10 +15,51 @@ export default function SignUpScreen({ onSignUp, onLogin }: SignUpScreenProps) {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
-  const handleSignUp = () => {
-    // Simulate signup
-    onSignUp();
+  const handleSignUp = async () => {
+    if (!name || !password) {
+      setErrorMsg("Name and Password are required");
+      return;
+    }
+    
+    setIsLoading(true);
+    setErrorMsg("");
+    try {
+      if (signUpMethod === "email") {
+        if (!email) throw new Error("Email is required");
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              full_name: name,
+            }
+          }
+        });
+        if (error) throw error;
+      } else {
+        if (!phone) throw new Error("Phone is required");
+        const { data, error } = await supabase.auth.signUp({
+          phone: `+91${phone}`,
+          password,
+          options: {
+            data: {
+              full_name: name,
+            }
+          }
+        });
+        if (error) throw error;
+      }
+      
+      // Success! Proceed to next screen
+      onSignUp();
+    } catch (err: any) {
+      setErrorMsg(err.message || "Failed to sign up");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -183,17 +225,35 @@ export default function SignUpScreen({ onSignUp, onLogin }: SignUpScreenProps) {
           </div>
         </motion.div>
 
+        {/* Error Message */}
+        {errorMsg && (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-red-400 text-xs text-center mb-4"
+          >
+            {errorMsg}
+          </motion.p>
+        )}
+
         {/* Sign Up Button */}
         <motion.button
           onClick={handleSignUp}
+          disabled={isLoading}
           className="w-full h-14 rounded-2xl bg-gradient-to-r from-[#7C5CE8] to-[#A890F0] text-white font-semibold text-base flex items-center justify-center gap-2 mb-6"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
           whileTap={{ scale: 0.98 }}
         >
-          Create Account
-          <ArrowRight size={20} />
+          {isLoading ? (
+             <Loader2 size={20} className="animate-spin" />
+          ) : (
+            <>
+              Create Account
+              <ArrowRight size={20} />
+            </>
+          )}
         </motion.button>
 
         {/* Divider */}

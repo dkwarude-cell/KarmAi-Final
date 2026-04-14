@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { motion } from "motion/react";
-import { Mail, Phone, ArrowRight, Eye, EyeOff } from "lucide-react";
+import { Mail, Phone, ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react";
 import SocialProofBanner from "./SocialProofBanner";
+import { supabase } from "../../../src/utils/supabase";
 
 interface LoginScreenProps {
   onLogin: () => void;
@@ -14,10 +15,42 @@ export default function LoginScreen({ onLogin, onSignUp }: LoginScreenProps) {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
-  const handleLogin = () => {
-    // Simulate login
-    onLogin();
+  const handleLogin = async () => {
+    if (!password) {
+      setErrorMsg("Password is required");
+      return;
+    }
+    
+    setIsLoading(true);
+    setErrorMsg("");
+    try {
+      if (loginMethod === "email") {
+        if (!email) throw new Error("Email is required");
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (error) throw error;
+      } else {
+        if (!phone) throw new Error("Phone is required");
+        // Warning: Phone auth requires a provider like Twilio set up in Supabase
+        const { data, error } = await supabase.auth.signInWithPassword({
+          phone: `+91${phone}`,
+          password,
+        });
+        if (error) throw error;
+      }
+      
+      // Success!
+      onLogin();
+    } catch (err: any) {
+      setErrorMsg(err.message || "Invalid login credentials");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -101,6 +134,17 @@ export default function LoginScreen({ onLogin, onSignUp }: LoginScreenProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
         >
+          {/* Error Message */}
+          {errorMsg && (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-red-400 text-xs text-center mb-4"
+            >
+              {errorMsg}
+            </motion.p>
+          )}
+
           {loginMethod === "email" ? (
             <div>
               <label className="text-[#888899] text-xs mb-2 block">Email Address</label>
@@ -172,14 +216,21 @@ export default function LoginScreen({ onLogin, onSignUp }: LoginScreenProps) {
         {/* Login Button */}
         <motion.button
           onClick={handleLogin}
+          disabled={isLoading}
           className="w-full h-14 rounded-2xl bg-gradient-to-r from-[#7C5CE8] to-[#A890F0] text-white font-semibold text-base flex items-center justify-center gap-2 mb-6"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.5 }}
           whileTap={{ scale: 0.98 }}
         >
-          Continue
-          <ArrowRight size={20} />
+          {isLoading ? (
+            <Loader2 size={20} className="animate-spin" />
+          ) : (
+            <>
+              Continue
+              <ArrowRight size={20} />
+            </>
+          )}
         </motion.button>
 
         {/* Divider */}

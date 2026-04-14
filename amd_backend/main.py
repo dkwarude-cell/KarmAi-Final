@@ -82,15 +82,16 @@ async def generate_chat(request: ChatRequest):
         try:
             query_embedding = embedder.encode(request.prompt).tolist()
             # Remote pgvector SQL search via RPC
+            # Ensure rpc_match_locations.sql is executed in your Supabase SQL Editor
             result = supabase_client.rpc("match_locations", {
                 "query_embedding": query_embedding,
-                "match_threshold": 0.7,
+                "match_threshold": 0.2, # Lowered threshold to ensure some matches occur even with sparse data
                 "match_count": 3
             }).execute()
             
             if result.data:
                 context_data = result.data
-                venues = "\n".join([f"- {v['name']} (Price: {v.get('price_rating')})" for v in context_data])
+                venues = "\n".join([f"- {v['name']} (Price: {v.get('price_rating')}) - {v.get('description','')}" for v in context_data])
         except Exception as e:
             print("DB RAG error:", str(e))
 
