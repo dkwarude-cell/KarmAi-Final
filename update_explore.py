@@ -1,4 +1,8 @@
-import { useState } from "react";
+import os
+
+filepath = r"KarmAI Mobile App Design\src\app\components\ExploreSection.tsx"
+
+new_explore = """import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Heart, MessageCircle, Send, Bookmark, MapPin, Camera, Plus, Star, CheckCircle, X } from "lucide-react";
 
@@ -221,15 +225,10 @@ export default function ExploreSection({ onPlaceClick, onPersonClick, campusMode
               </button>
             </div>
 
-            <label className="w-full aspect-square bg-[#1A1A22] rounded-2xl flex flex-col items-center justify-center border-2 border-dashed border-[#333344] mb-4 cursor-pointer relative overflow-hidden">
-               <input type="file" accept="image/*,video/*" className="absolute inset-0 opacity-0 cursor-pointer" onChange={(e) => { 
-                 if(e.target.files && e.target.files[0]) {
-                   alert("File selected: " + e.target.files[0].name + " (MOCKED UPLOAD)");
-                 }
-               }} />
+            <div className="w-full aspect-square bg-[#1A1A22] rounded-2xl flex flex-col items-center justify-center border-2 border-dashed border-[#333344] mb-4">
                <Camera size={40} className="text-[#666677] mb-2" />
-               <span className="text-[#666677] font-semibold">Click to Upload Photo/Video</span>
-            </label>
+               <span className="text-[#666677] font-semibold">Upload Photo/Video</span>
+            </div>
 
             <textarea 
               value={postIdea}
@@ -249,3 +248,9 @@ export default function ExploreSection({ onPlaceClick, onPersonClick, campusMode
     </div>
   );
 }
+"""
+
+with open(filepath, 'w', encoding='utf-8') as f:
+    f.write(new_explore)
+
+print("Updated ExploreSection with fully working Instagram Feed!")

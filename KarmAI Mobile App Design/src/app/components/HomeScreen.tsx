@@ -24,11 +24,11 @@ export default function HomeScreen({ onNavigate, onShowDriftDetail, onShowPartne
             style={{ backgroundColor: "rgba(124, 92, 232, 0.15)" }}
           >
             <span className="text-white font-medium" style={{ fontSize: "13px" }}>
-              DW
+              PR
             </span>
           </div>
           <span className="text-white font-medium" style={{ fontSize: "15px" }}>
-            Good evening, Deepak
+            Good evening, Priya
           </span>
         </div>
         <div className="flex items-center gap-3">
@@ -181,14 +181,14 @@ export default function HomeScreen({ onNavigate, onShowDriftDetail, onShowPartne
             </div>
             <div className="w-9 h-9 rounded-full bg-[#00CBA4] border-2 border-[#0A0A0F] flex items-center justify-center">
               <span className="text-white font-medium" style={{ fontSize: "12px" }}>
-                DW
+                PR
               </span>
             </div>
           </div>
 
           <div className="flex-1">
             <p className="text-white font-medium" style={{ fontSize: "13px" }}>
-              91% match potential with Priya (ICT)
+              91% match potential with Deepak (ICT)
             </p>
             <p className="text-[#666677]" style={{ fontSize: "11px" }}>
               Complementary skills: Design + Engineering

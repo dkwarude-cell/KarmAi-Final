@@ -1028,11 +1028,20 @@ export default function WithinCampusView({ onPlaceClick, onShowPartnerDashboard 
                           {tool.used}
                         </span>
                         <button
-                          className="px-4 py-2 rounded-lg font-semibold"
+                          onClick={() => {
+                            if (tool.title.includes("Poster")) {
+                              window.open('https://designer.microsoft.com', '_blank');
+                            } else if (tool.title.includes("Caption")) {
+                              window.open('https://chatgpt.com', '_blank');
+                            } else {
+                              window.open('https://www.canva.com/brand', '_blank');
+                            }
+                          }}
+                          className="px-4 py-2 rounded-xl font-bold transition-transform active:scale-95 shadow-sm"
                           style={{
                             backgroundColor: tool.color,
                             color: "#FFFFFF",
-                            fontSize: "12px",
+                            fontSize: "14px",
                           }}
                         >
                           Try Now

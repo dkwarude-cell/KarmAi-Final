@@ -47,9 +47,9 @@ export interface UserProfile {
 }
 
 export const defaultProfile: UserProfile = {
-  name: "Deepak Walia",
+  name: "Priya Raut",
   college: "ICT Mumbai",
-  course: "Computer Engineering",
+  course: "Design + Tech",
   year: "3rd Year",
   primaryInterests: ["Photography", "Music", "Tech", "Design", "Film", "Reading"],
   hiddenInterests: ["Philosophy", "Fine Arts"],

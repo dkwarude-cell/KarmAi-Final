@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Search, Plus, Minus, MapPin, Compass, Users, User, Home, Award, Trophy, Info, TrendingUp, Brain, X, Settings, ArrowLeft, Wand2 } from "lucide-react";
+import ActionModal from "./components/ActionModal";
 import SplashScreen from "./components/SplashScreen";
 import InterestSelectionScreen from "./components/InterestSelectionScreen";
 import LoginScreen from "./components/LoginScreen";
@@ -88,6 +89,7 @@ export default function App() {
   const [showSquadDrift, setShowSquadDrift] = useState(false);
   const [showAccessibility, setShowAccessibility] = useState(false);
   const [showCreatorStudio, setShowCreatorStudio] = useState(false);
+  const [activeActionModal, setActiveActionModal] = useState<{type: string, placeName: string} | null>(null);
   const [hideMap, setHideMap] = useState(true); // Start with map hidden since we default to home view
   // Global Auth Sync
   useEffect(() => {
@@ -669,6 +671,23 @@ export default function App() {
               />
             </motion.div>
           )}
+          
+          {/* GPS Active Indicator */}
+          {!hideMap && (
+            <motion.div
+              className="absolute bottom-28 left-1/2 -translate-x-1/2 z-20 px-4 py-2 rounded-full border bg-white flex items-center gap-2 shadow-lg"
+              style={{ borderColor: "#00CBA4" }}
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 1 }}
+            >
+              <div className="relative flex items-center justify-center w-3 h-3">
+                <div className="absolute w-full h-full bg-[#00CBA4] rounded-full animate-ping opacity-75"></div>
+                <div className="relative w-2 h-2 bg-[#00CBA4] rounded-full"></div>
+              </div>
+              <span className="text-[#1A1A1A] font-bold text-xs">Live GPS tracking active</span>
+            </motion.div>
+          )}
         </div>
 
         {/* Campus-Specific Views */}
@@ -957,32 +976,53 @@ export default function App() {
                 </p>
               </div>
 
-              <div className="flex gap-2">
-                <button
-                  onClick={() => {
-                    setCheckInPlace(selectedMarker);
-                    setShowCheckIn(true);
-                  }}
-                  className="flex-1 h-12 rounded-xl border text-[#00CBA4] font-medium flex items-center justify-center gap-2"
-                  style={{
-                    borderColor: "#00CBA4",
-                    backgroundColor: "rgba(0, 203, 164, 0.05)",
-                    fontSize: "14px",
-                  }}
-                >
-                  <MapPin size={16} className="text-[#00CBA4]" />
-                  Check-in
-                </button>
-                <button
-                  onClick={() => {
-                    setShowDriftDetail(true);
-                    setSelectedMarker(null);
-                  }}
-                  className="flex-1 h-12 rounded-xl bg-[#7C5CE8] text-white font-medium"
-                  style={{ fontSize: "14px" }}
-                >
-                  Add to drift
-                </button>
+              <div className="flex flex-col gap-2">
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      setCheckInPlace(selectedMarker);
+                      setShowCheckIn(true);
+                    }}
+                    className="flex-1 h-12 rounded-xl border text-[#00CBA4] font-medium flex items-center justify-center gap-2"
+                    style={{
+                      borderColor: "#00CBA4",
+                      backgroundColor: "rgba(0, 203, 164, 0.05)",
+                      fontSize: "14px",
+                    }}
+                  >
+                    <MapPin size={16} className="text-[#00CBA4]" />
+                    Check-in
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowDriftDetail(true);
+                      setSelectedMarker(null);
+                    }}
+                    className="flex-1 h-12 rounded-xl bg-[#7C5CE8] text-white font-medium"
+                    style={{ fontSize: "14px" }}
+                  >
+                    Add to drift
+                  </button>
+                </div>
+                
+                {/* Dynamically inserted Contextual Action Buttons */}
+                <div className="grid grid-cols-2 gap-2 mt-2">
+                  {campusMode === "within" ? (
+                    <>
+                      <button onClick={() => setActiveActionModal({type: 'order', placeName: selectedMarker.name})} className="h-10 rounded-lg bg-[#FF6B35] text-white font-medium text-xs shadow-md shadow-[#FF6B35]/20 hover:opacity-90">Order Now</button>
+                      <button onClick={() => setActiveActionModal({type: 'register', placeName: selectedMarker.name})} className="h-10 rounded-lg bg-[#333344] text-white font-medium text-xs shadow-md hover:bg-[#2A2A3A]">Register Now</button>
+                      <button onClick={() => { setShowAICards(true); setSelectedMarker(null); }} className="h-10 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-medium text-xs flex items-center justify-center gap-1 shadow-md shadow-purple-500/20 hover:opacity-90"><Wand2 size={12}/> Ask AI</button>
+                      <button onClick={() => setActiveActionModal({type: 'group', placeName: selectedMarker.name})} className="h-10 rounded-lg bg-[#00CBA4] text-white font-medium text-xs shadow-md shadow-[#00CBA4]/20 hover:opacity-90">Join Group</button>
+                    </>
+                  ) : (
+                    <>
+                      <button onClick={() => window.open('https://maps.google.com/maps?q=' + selectedMarker.name, '_blank')} className="h-10 rounded-lg bg-[#FF6B35] text-white font-medium text-xs shadow-md shadow-[#FF6B35]/20 hover:opacity-90">Visit</button>
+                      <button onClick={() => setActiveActionModal({type: 'book', placeName: selectedMarker.name})} className="h-10 rounded-lg bg-[#333344] text-white font-medium text-xs shadow-md hover:bg-[#2A2A3A]">Book Table</button>
+                      <button onClick={() => setActiveActionModal({type: 'book', placeName: selectedMarker.name})} className="h-10 rounded-lg border border-[#7C5CE8] text-[#7C5CE8] font-medium text-xs shadow-sm bg-[#7C5CE8]/10 hover:bg-[#7C5CE8]/20">Book Now</button>
+                      <button onClick={() => window.open('https://maps.google.com/maps?daddr=' + selectedMarker.name, '_blank')} className="h-10 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium text-xs shadow-md shadow-pink-500/20 hover:opacity-90">Start this journey</button>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           )}
@@ -1206,6 +1246,16 @@ export default function App() {
           <div className="absolute inset-0 z-50">
             <RewardsWallet onClose={() => setShowRewardsWallet(false)} gamification={gamification} />
           </div>
+        )}
+
+        {/* Dynamic Action Modals */}
+        {activeActionModal && (
+          <ActionModal 
+             isOpen={true} 
+             onClose={() => setActiveActionModal(null)} 
+             actionType={activeActionModal.type} 
+             placeName={activeActionModal.placeName} 
+          />
         )}
 
         {/* Leaderboard */}
